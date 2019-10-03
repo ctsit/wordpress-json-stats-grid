@@ -45,6 +45,7 @@ function redcap_stats_plugin_cgb_block_assets() { // phpcs:ignore
 		true // Enqueue the script in the footer.
 	);
 
+
 	// Register block editor styles for backend.
 	wp_register_style(
 		'redcap_stats_plugin-cgb-block-editor-css', // Handle.
@@ -88,3 +89,9 @@ function redcap_stats_plugin_cgb_block_assets() { // phpcs:ignore
 
 // Hook: Block assets.
 add_action( 'init', 'redcap_stats_plugin_cgb_block_assets' );
+// add needed js
+wp_register_script(
+        'redcap_stats_plugin-populate',
+        plugins_url('/src/block/populate.js', dirname( __FILE__ ))
+        );
+wp_enqueue_script( 'redcap_stats_plugin-populate' );

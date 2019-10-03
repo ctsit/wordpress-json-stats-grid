@@ -1,3 +1,4 @@
+//const endpoint = "https://redcap.ctsi.ufl.edu/redcap/api/?type=module&prefix=redcap_webservices&page=plugins%2Fendpoint&NOAUTH&query_id=system_stats";
 /**
  * BLOCK: redcap-stats-plugin
  *
@@ -11,6 +12,33 @@ import './style.scss';
 
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
+
+const { InspectorControls } = wp.editor;
+const { TextControl } = wp.components;
+
+// Define used functions
+function displayStats(root, stats) {
+    console.log(Object.keys(stats));
+
+    Object.keys(stats).forEach(function(key) {
+            document.getElementById(key).prepend(`${stats[key]} `);
+            });
+}
+
+function getRCMetrics(endpoint) {
+    const root = document.getElementById("rcmetrics");
+    console.log('called');
+    fetch(endpoint)
+        .then(function (resp) {
+            return resp.json();
+        })
+        .then(function (stats) {
+            if (!stats.success || !stats.data || stats.data.length !== 1) {
+                return;
+            }
+            displayStats(root, stats);
+        });
+}
 
 /**
  * Register: aa Gutenberg Block.
@@ -36,6 +64,16 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 		__( 'create-guten-block' ),
 	],
 
+    attributes: {
+        endpoint: {
+            type: 'string',
+            default: '',
+        },
+    },
+
+    // { 'endpoint':"https://redcap.ctsi.ufl.edu/redcap/api/?type=module&prefix=redcap_webservices&page=plugins%2Fendpoint&NOAUTH&query_id=system_stats" }
+
+
 	/**
 	 * The edit function describes the structure of your block in the context of the editor.
 	 * This represents what the editor will render when the block is used.
@@ -49,22 +87,34 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 */
 	edit: ( props ) => {
 		// Creates a <p class='wp-block-cgb-block-redcap-stats-plugin'></p>.
+        function onChangeTextField( newValue ) {
+			props.setAttributes( { endpoint: newValue } );
+		}
 		return (
+            [
+            <InspectorControls>
+                <TextControl
+						label="API endpoint"
+						help="Additional help text"
+                        value = { props.attributes.endpoint }
+						onChange={ onChangeTextField }
+					/>
+            </InspectorControls>
+            ,
+            <React.Fragment>
 			<div className={ props.className }>
-				<p>— Hello from the backend.</p>
-				<p>
-					CGB BLOCK: <code>redcap-stats-plugin</code> is a new Gutenberg block
-				</p>
-				<p>
-					It was created via{ ' ' }
-					<code>
-						<a href="https://github.com/ahmadawais/create-guten-block">
-							create-guten-block
-						</a>
-					</code>.
-				</p>
+                <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
+                <div id="rcmetrics">
+                    <div class="grid-item" id="count_of_existing_projects">Existing Projects</div>
+                    <div class="grid-item" id="count_of_projects_created_in_the_past_30_days">Projects Created This Month</div>
+                    <div class="grid-item" id="count_of_projects_moved_to_production_in_the_past_30_days">Projects Moved to Production This Month</div>
+                    <div class="grid-item" id="count_of_users_active_in_the_past_30_days">Active Users This Month</div>
+                </div>
 			</div>
+            </React.Fragment>
+            ]
 		);
+
 	},
 
 	/**
@@ -80,20 +130,17 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 */
 	save: ( props ) => {
 		return (
+            <React.Fragment>
 			<div className={ props.className }>
-				<p>— Hello from the frontend.</p>
-				<p>
-					CGB BLOCK: <code>redcap-stats-plugin</code> is a new Gutenberg block.
-				</p>
-				<p>
-					It was created via{ ' ' }
-					<code>
-						<a href="https://github.com/ahmadawais/create-guten-block">
-							create-guten-block
-						</a>
-					</code>.
-				</p>
+                <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
+                <div id="rcmetrics">
+                    <div class="grid-item" id="count_of_existing_projects">Existing Projects</div>
+                    <div class="grid-item" id="count_of_projects_created_in_the_past_30_days">Projects Created This Month</div>
+                    <div class="grid-item" id="count_of_projects_moved_to_production_in_the_past_30_days">Projects Moved to Production This Month</div>
+                    <div class="grid-item" id="count_of_users_active_in_the_past_30_days">Active Users This Month</div>
+                </div>
 			</div>
+            </React.Fragment>
 		);
 	},
 } );
