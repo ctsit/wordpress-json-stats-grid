@@ -46,6 +46,24 @@ function getRCMetrics(endpoint) {
         });
 }
 
+//This also gets called every time a onChangeFieldName is called
+function SetFieldNames(props) {
+    console.log('SetFieldNames called');
+    if (!props.stats) {
+        return 'Please enter a valid URL';
+    }
+        let fieldItems = Object.keys(props.stats).map( (key) =>
+                <TextControl
+                    label={key}
+                    help='Name that will appear'
+                    value={ props.fieldNames[key] }
+                    onChange={(newValue) => props.onChange({newValue, key})}
+                />
+            );
+        return fieldItems;
+}
+
+
 //getRCMetrics('https://redcap.ctsi.ufl.edu/redcap/api/?type=module&prefix=redcap_webservices&page=plugins%2Fendpoint&NOAUTH&query_id=system_stats');
 
 /**
@@ -124,35 +142,18 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
             return fieldItems;
         }
 
-        //This also gets called every time a onChangeFieldName is called
-        function SetFieldNames() {
-            console.log('SetFieldNames called');
-            const stats = props.attributes.stats;
-            try {
-                let fieldItems = [];
-                for (const key of Object.keys(stats)) {
-                    fieldItems.push(
-                        <TextControl
-                            label={key}
-                            help='Name that will appear'
-                            value={ props.attributes.fieldNames[key] }
-                            onChange={ (newValue) => onChangeFieldName({newValue, key}) }
-                        />
-                    );
-                }
-                return fieldItems;
-            } catch(e) {
-                return 'Please enter a valid URL';
-            };
-        }
-
         function onChangeFieldName( obj ) {
-            console.log('onchangefieldname');
+            console.log('onchangefieldname', obj);
             const key = obj.key;
             const value = obj.newValue;
             try {
-                props.attributes.fieldNames[key] = value;
-                const thisFieldName = props.attributes.fieldNames[key];
+                //props.attributes.fieldNames[key] = value;
+                //const thisFieldName = props.attributes.fieldNames[key];
+                console.log("old field names", props.attributes.fieldNames);
+                const fieldNames = {...props.attributes.fieldNames};
+                fieldNames[key] = value;
+                console.log("new Field names", fieldNames);
+                props.setAttributes({fieldNames: fieldNames});
                 //props.setAttributes( { fieldNames: props.attributes.fieldNames } );
             } catch(e) {
                 console.log('error on fieldname');
@@ -187,7 +188,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
                     onChange={ onChangeEndpointURL }
                 />
 
-                <SetFieldNames />
+                <SetFieldNames stats={props.attributes.stats} fieldNames={props.attributes.fieldNames} onChange={onChangeFieldName}/>
 
                 <DropdownMenu
                     icon="move"
