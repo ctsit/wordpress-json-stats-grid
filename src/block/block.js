@@ -16,25 +16,19 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
 
 const { InspectorControls } = wp.editor;
 const {
-    TextControl,
     DropdownMenu,
     MenuGroup,
-    MenuItem
+    MenuItem,
+    ColorPicker,
+    TextControl
 } = wp.components;
 
-var baseHTML = <div id='rcmetrics'><h1>HELLO WORLD</h1></div>;
-
+// format an entry, the number value will be prepended later
 function StatRow(props) {
-    return <div class="grid-item" id={props.id}>{props.icon} {props.value} {props.text}</div>
+    return <div class="grid-item" id={props.id}>{props.icon} {props.text}</div>
 }
 
-// Define used functions
-function displayStats(root, stats) {
-    Object.keys(stats).forEach(function(key) {
-            root.getElementById(key).prepend(`${stats[key]} `);
-            });
-}
-
+// Make API Call
 function getRCMetrics(endpoint) {
     return fetch(endpoint)
         .then((resp) => resp.json())
@@ -46,16 +40,15 @@ function getRCMetrics(endpoint) {
         });
 }
 
-//This also gets called every time a onChangeFieldName is called
+//Return a set of text boxes allowing an editor to set a name to appear for each field returned by the API call
 function SetFieldNames(props) {
-    console.log('SetFieldNames called');
     if (!props.stats) {
         return 'Please enter a valid URL';
     }
         let fieldItems = Object.keys(props.stats).map( (key) =>
                 <TextControl
                     label={key}
-                    help='Name that will appear'
+                    help='Text that will appear after this metric'
                     value={ props.fieldNames[key] }
                     onChange={(newValue) => props.onChange({newValue, key})}
                 />
@@ -63,8 +56,28 @@ function SetFieldNames(props) {
         return fieldItems;
 }
 
-
-//getRCMetrics('https://redcap.ctsi.ufl.edu/redcap/api/?type=module&prefix=redcap_webservices&page=plugins%2Fendpoint&NOAUTH&query_id=system_stats');
+// Render the fields the user will see in the gutenblock
+function RenderFields(props) {
+    try {
+        let rows;
+        // stats are only passed in the editor setting
+        // they are prepended by javascript in the user-facing site to ensure up-to-date results
+        if (props.hasOwnProperty('stats')) {
+            rows = Object.keys(props.fieldNames).map( (key) =>
+                <div class="grid-item" id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
+                );
+        } else {
+            rows = Object.keys(props.fieldNames).map( (key) =>
+                <div class="grid-item" id={key}>{props.fieldNames[key]} </div>
+                );
+        }
+        return rows;
+    } catch(e) {
+        console.log('error on RenderFields');
+        console.log(e);
+        return 'Please enter a valid URL';
+    }
+}
 
 /**
  * Register: aa Gutenberg Block.
@@ -99,11 +112,10 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
             type: 'object'
         },
         fieldNames: {
-            type: 'object'
+            type: 'object',
+            default: {}
         }
     },
-
-    // { 'endpoint':"https://redcap.ctsi.ufl.edu/redcap/api/?type=module&prefix=redcap_webservices&page=plugins%2Fendpoint&NOAUTH&query_id=system_stats" }
 
 
 	/**
@@ -119,62 +131,26 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 */
 	edit: ( props ) => {
 		// Creates a <p class='wp-block-cgb-block-redcap-stats-plugin'></p>.
-        console.log('props', props);
         function onChangeEndpointURL( newValue ) {
 			props.setAttributes( { endpoint: newValue } );
 			getRCMetrics(newValue).then((data) => {
                 props.setAttributes( {stats : data[0] });
-                //const fieldItems = populateDataFields(props.attributes.stats);
-                //ReactDOM.render(fieldItems, document.getElementsByClassName('components-base-control')[0]);
                 });
-            console.log('props update', props);
 		}
 
-        function populateDataFields(stats) {
-            console.log('popDF called');
-            console.log(stats);
-            const fieldItems = Object.keys(stats).map( (key) =>
-                <TextControl
-                    label={key}
-                    help='Name that will appear'
-                />
-            );
-            return fieldItems;
-        }
-
         function onChangeFieldName( obj ) {
-            console.log('onchangefieldname', obj);
             const key = obj.key;
-            const value = obj.newValue;
+            const newValue = obj.newValue;
             try {
-                //props.attributes.fieldNames[key] = value;
-                //const thisFieldName = props.attributes.fieldNames[key];
-                console.log("old field names", props.attributes.fieldNames);
                 const fieldNames = {...props.attributes.fieldNames};
-                fieldNames[key] = value;
-                console.log("new Field names", fieldNames);
+                if (newValue === '') {
+                    delete fieldNames[key];
+                } else {
+                    fieldNames[key] = newValue;
+                }
                 props.setAttributes({fieldNames: fieldNames});
-                //props.setAttributes( { fieldNames: props.attributes.fieldNames } );
             } catch(e) {
-                console.log('error on fieldname');
-                console.log(e);
-                console.log(props.attributes);
                 props.setAttributes( {fieldNames: {}} );
-            }
-        }
-
-        function RenderFields() {
-            console.log('render');
-            console.log(props);
-            try {
-                const rows = Object.keys(props.attributes.fieldNames).map( (key) =>
-                    <div class="grid-item" id={key}> {props.attributes.stats[key]} {props.attributes.fieldNames[key]} </div>
-                    );
-                return rows;
-            } catch(e) {
-                console.log('error on RenderFields');
-                console.log(e);
-                return 'Please enter a valid URL';
             }
         }
 
@@ -183,10 +159,11 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
             <InspectorControls>
                 <TextControl
                     label="API endpoint"
-                    help="Additional help text"
+                    help="The URL for your JSON data"
                     value = { props.attributes.endpoint }
                     onChange={ onChangeEndpointURL }
                 />
+            <ColorPicker />
 
                 <SetFieldNames stats={props.attributes.stats} fieldNames={props.attributes.fieldNames} onChange={onChangeFieldName}/>
 
@@ -210,11 +187,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 			<div className={ props.className }>
                 <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
                 <div id="rcmetrics">
-                <RenderFields />
-                    <div class="grid-item" id="count_of_existing_projects">Existing Projects</div>
-                    <div class="grid-item" id="count_of_projects_created_in_the_past_30_days">Projects Created This Month</div>
-                    <div class="grid-item" id="count_of_projects_moved_to_production_in_the_past_30_days">Projects Moved to Production This Month</div>
-                    <div class="grid-item" id="count_of_users_active_in_the_past_30_days">Active Users This Month</div>
+                    <RenderFields fieldNames={props.attributes.fieldNames} stats={props.attributes.stats}/>
                 </div>
 			</div>
             </React.Fragment>
@@ -235,22 +208,12 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 * @returns {Mixed} JSX Frontend HTML.
 	 */
 	save: ( props ) => {
-        function RenderFields() {
-            const rows = Object.keys(props.attributes.fieldNames).map( (key) =>
-                <div class="grid-item" id={key}> {props.attributes.stats[key]} {props.attributes.fieldNames[key]} </div>
-                );
-            return rows;
-        }
-        console.log(props);
 		return (
             <React.Fragment>
 			<div className={ props.className }>
                 <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
                 <div id="rcmetrics">
-                    <div class="grid-item" id="count_of_existing_projects">Existing Projects</div>
-                    <div class="grid-item" id="count_of_projects_created_in_the_past_30_days">Projects Created This Month</div>
-                    <div class="grid-item" id="count_of_projects_moved_to_production_in_the_past_30_days">Projects Moved to Production This Month</div>
-                    <div class="grid-item" id="count_of_users_active_in_the_past_30_days">Active Users This Month</div>
+                    <RenderFields fieldNames={props.attributes.fieldNames} />
                 </div>
 			</div>
             </React.Fragment>
