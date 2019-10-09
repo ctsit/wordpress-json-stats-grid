@@ -19,12 +19,7 @@ const {
     PanelColorSettings
 } = wp.editor;
 
-const {
-    DropdownMenu,
-    MenuGroup,
-    MenuItem,
-    TextControl
-} = wp.components;
+const { TextControl } = wp.components;
 
 // Make API Call
 function getRCMetrics(endpoint) {
@@ -90,8 +85,8 @@ function RenderFields(props) {
  */
 registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	// Block name. Block names must be string that contains a namespace prefix. Example: my-plugin/my-custom-block.
-	title: __( 'redcap-stats-plugin - CGB Block' ), // Block title.
-	icon: 'shield', // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
+	title: __( 'JSON Stats Grid' ), // Block title.
+	icon: 'chart-line', // Block icon from Dashicons → https://developer.wordpress.org/resource/dashicons/.
 	category: 'common', // Block category — Group blocks together based on common traits E.g. common, formatting, layout widgets, embed.
 	keywords: [
 		__( 'redcap-stats-plugin — CGB Block' ),
@@ -191,21 +186,6 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
                         />
 
                 <SetFieldNames stats={props.attributes.stats} fieldNames={props.attributes.fieldNames} onChange={onChangeFieldName}/>
-
-                <DropdownMenu
-                    icon="move"
-                    label="define some stuff"
-                >
-                    <MenuGroup>
-                        <MenuItem
-                            icon='arrow-up-alt'
-                        >
-                        up
-                        </MenuItem>
-
-                    </MenuGroup>
-                </DropdownMenu>
-
             </InspectorControls>
             ,
             <React.Fragment>
