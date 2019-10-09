@@ -14,19 +14,17 @@ import './style.scss';
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
 
-const { InspectorControls } = wp.editor;
+const {
+    InspectorControls,
+    PanelColorSettings
+} = wp.editor;
+
 const {
     DropdownMenu,
     MenuGroup,
     MenuItem,
-    ColorPicker,
     TextControl
 } = wp.components;
-
-// format an entry, the number value will be prepended later
-function StatRow(props) {
-    return <div class="grid-item" id={props.id}>{props.icon} {props.text}</div>
-}
 
 // Make API Call
 function getRCMetrics(endpoint) {
@@ -45,7 +43,7 @@ function SetFieldNames(props) {
     if (!props.stats) {
         return 'Please enter a valid URL';
     }
-        let fieldItems = Object.keys(props.stats).map( (key) =>
+        const fieldItems = Object.keys(props.stats).map( (key) =>
                 <TextControl
                     label={key}
                     help='Text that will appear after this metric'
@@ -73,8 +71,6 @@ function RenderFields(props) {
         }
         return rows;
     } catch(e) {
-        console.log('error on RenderFields');
-        console.log(e);
         return 'Please enter a valid URL';
     }
 }
@@ -114,6 +110,14 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
         fieldNames: {
             type: 'object',
             default: {}
+        },
+        bgColor: {
+            type: 'string',
+            default: ''
+        },
+        textColor: {
+            type: 'string',
+            default: ''
         }
     },
 
@@ -163,7 +167,28 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
                     value = { props.attributes.endpoint }
                     onChange={ onChangeEndpointURL }
                 />
-            <ColorPicker />
+
+                <PanelColorSettings 
+                            title={ __('Background Color', 'tar') }
+                            colorSettings={ [ 
+                                {
+                                value: props.attributes.bgColor,
+                                onChange: (colorValue) => props.setAttributes ( { bgColor: colorValue } ),
+                                label: __('Color', 'tar'),
+                                },
+                             ] }
+                        />
+
+                <PanelColorSettings 
+                            title={ __('Text Color', 'tar') }
+                            colorSettings={ [ 
+                                {
+                                value: props.attributes.textColor,
+                                onChange: (colorValue) => props.setAttributes ( { textColor: colorValue } ),
+                                label: __('Color', 'tar'),
+                                },
+                             ] }
+                        />
 
                 <SetFieldNames stats={props.attributes.stats} fieldNames={props.attributes.fieldNames} onChange={onChangeFieldName}/>
 
@@ -184,7 +209,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
             </InspectorControls>
             ,
             <React.Fragment>
-			<div className={ props.className }>
+			<div className={ props.className } style={{backgroundColor: props.attributes.bgColor, color: props.attributes.textColor}} >
                 <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
                 <div id="rcmetrics">
                     <RenderFields fieldNames={props.attributes.fieldNames} stats={props.attributes.stats}/>
@@ -210,7 +235,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	save: ( props ) => {
 		return (
             <React.Fragment>
-			<div className={ props.className }>
+			<div className={ props.className } style={{backgroundColor: props.attributes.bgColor, color: props.attributes.textColor}} >
                 <p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
                 <div id="rcmetrics">
                     <RenderFields fieldNames={props.attributes.fieldNames} />
