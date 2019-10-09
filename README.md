@@ -1,6 +1,6 @@
 # Wordpress JSON Stats Grid
 
-Intended for use with REDCap external module [redcap_webservices](https://github.com/ctsit/redcap_webservices) to present summary statistics of a REDCap instance on a WordPress website as a Gutenberg block.
+Intended for use with REDCap external module [REDCap Web Services](https://github.com/ctsit/redcap_webservices) to present summary statistics of a REDCap instance on a WordPress website as a Gutenberg block.
 
 ## Use
 Configure your `redcap_webservices` module to perform a SQL query that returns a 2 column table in the format: `field_name`, `field_value`. Use the endpoint of your SQL query as the argument for your **API endpoint** in the block settings on your WordPress page.
