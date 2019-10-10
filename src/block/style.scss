@@ -4,20 +4,20 @@
  * CSS for both Frontend+Backend.
  */
 
-.wp-block-cgb-block-redcap-stats-plugin  {
-  margin: 0 auto;
-  max-width: 740px;
-  padding: 2rem;
+.wp-block-cgb-block-redcap-stats-plugin {
+	margin: 0 auto;
+	max-width: 740px;
+	padding: 2rem;
 }
 
 #rcmetrics {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr); /* 2 columns */
-  grid-gap: 10px;
-  padding: 10px;
+	display: grid;
+	grid-template-columns: repeat(2, 1fr); /* 2 columns */
+	grid-gap: 10px;
+	padding: 10px;
 }
 
 .grid-item {
-  padding: 20px;
-  text-align: center;
+	padding: 20px;
+	text-align: center;
 }

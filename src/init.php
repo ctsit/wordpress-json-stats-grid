@@ -89,9 +89,10 @@ function redcap_stats_plugin_cgb_block_assets() { // phpcs:ignore
 
 // Hook: Block assets.
 add_action( 'init', 'redcap_stats_plugin_cgb_block_assets' );
-// add needed js
+
+// add js needed to keep statistics updated after editing
 wp_register_script(
-        'redcap_stats_plugin-populate',
-        plugins_url('/src/block/populate.js', dirname( __FILE__ ))
-        );
+	'redcap_stats_plugin-populate',
+	plugins_url('/src/block/populate.js', dirname( __FILE__ ))
+);
 wp_enqueue_script( 'redcap_stats_plugin-populate' );

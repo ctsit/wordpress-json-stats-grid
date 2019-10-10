@@ -2,9 +2,9 @@
 /**
  * Plugin Name: Wordpress JSON Stats Grid
  * Plugin URI: https://github.com/ctsit/wordpress-json-stats-grid
- * Description: A gutenberg block to deliver data from an API to site visitors
- * Author: Kyle Chesney
- * Author URI: https://github.com/ChemiKyle
+ * Description: A gutenberg block to format and display data provided by an API to site visitors
+ * Author: Kyle Chesney, Taeber Rapczak, Philip Chase
+ * Author URI: https://github.com/ctsit
  * Version: 1.0.0
  * License: GPL2+
  * License URI: https://www.gnu.org/licenses/gpl-2.0.txt
