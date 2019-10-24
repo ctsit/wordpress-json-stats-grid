@@ -17,7 +17,11 @@ const {
 	PanelColorSettings
 } = wp.editor;
 
-const { TextControl } = wp.components;
+const {
+	PanelBody,
+	PanelRow,
+	TextControl
+} = wp.components;
 
 // Make API Call
 function getRCMetrics(endpoint) {
@@ -154,15 +158,9 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 		return (
 			[
 			<InspectorControls>
-				<TextControl
-					label="API endpoint"
-					help="The URL for your JSON data"
-					value={ props.attributes.endpoint }
-					onChange={ onChangeEndpointURL }
-				/>
-
 				<PanelColorSettings
 					title={ __('Background Color', 'tar') }
+					icon="admin-appearance"
 					colorSettings={ [ 
 						{
 						value: props.attributes.bgColor,
@@ -174,6 +172,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 
 				<PanelColorSettings
 					title={ __('Text Color', 'tar') }
+					icon="admin-customizer"
 					colorSettings={ [ 
 						{
 						value: props.attributes.textColor,
@@ -183,10 +182,22 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 					] }
 				/>
 
-				<SetFieldNames stats={ props.attributes.stats } fieldNames={ props.attributes.fieldNames } onChange={onChangeFieldName}/>
+				<PanelBody
+					title = "Set Field Names"
+					icon="edit"
+				>
+					<SetFieldNames stats={ props.attributes.stats } fieldNames={ props.attributes.fieldNames } onChange={onChangeFieldName} />
+				</PanelBody>
 			</InspectorControls>
 			,
 			<React.Fragment>
+				<TextControl
+					label="API endpoint"
+					help="The URL for your JSON data"
+					value={ props.attributes.endpoint }
+					onChange={ onChangeEndpointURL }
+				/>
+
 			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
 				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
 				<div id="rcmetrics">
