@@ -35,18 +35,25 @@ function getRCMetrics(endpoint) {
 		});
 }
 
-// Return a set of text boxes allowing an editor to set a name to appear for each field returned by the API call
-function SetFieldNames(props) {
+// Return a set of text boxes allowing an editor to set a name and icon to appear for each field returned by the API call
+function SetFieldAttrs(props) {
 	if (!props.stats) {
 		return 'Please enter a valid URL';
 	}
 		const fieldItems = Object.keys(props.stats).map( (key) =>
+				<React.Fragment>
 				<TextControl
 					label={key}
 					help='Text that will appear after this metric'
 					value={ props.fieldNames[key] }
-					onChange={(newValue) => props.onChange({newValue, key})}
+					onChange={(newValue) => props.onChange('fieldNames', {newValue, key})}
 				/>
+				<TextControl
+					label="Icon"
+					value={ props.fieldIcons[key] }
+					onChange={(newValue) => props.onChange('fieldIcons', {newValue, key})}
+				/>
+				</React.Fragment>
 			);
 		return fieldItems;
 }
@@ -59,11 +66,25 @@ function RenderFields(props) {
 		// they are prepended by javascript in the user-facing site to ensure up-to-date results
 		if (props.hasOwnProperty('stats')) {
 			rows = Object.keys(props.fieldNames).map( (key) =>
-				<div class="grid-item" id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
+				<React.Fragment>
+				{/* Force icon to align with text */}
+				<style dangerouslySetInnerHTML={{__html:
+					`#${key}::before{
+						vertical-align: middle;
+					}`}} />
+				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
+				</React.Fragment>
 				);
 		} else {
 			rows = Object.keys(props.fieldNames).map( (key) =>
-				<div class="grid-item" id={key}>{props.fieldNames[key]} </div>
+				<React.Fragment>
+				{/* Force icon to align with text */}
+				<style dangerouslySetInnerHTML={{__html:
+					`#${key}::before{
+						vertical-align: middle;
+					}`}} />
+				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.fieldNames[key]} </div>
+				</React.Fragment>
 				);
 		}
 		return rows;
@@ -108,6 +129,10 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 			type: 'object',
 			default: {}
 		},
+		fieldIcons: {
+			type: 'object',
+			default: {}
+		},
 		bgColor: {
 			type: 'string',
 			default: ''
@@ -139,19 +164,20 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 				});
 		}
 
-		function onChangeFieldName( obj ) {
+		function onChangeFieldAttr( fieldKey, obj ) {
 			const key = obj.key;
 			const newValue = obj.newValue;
 			try {
-				const fieldNames = {...props.attributes.fieldNames};
+				const fieldAttrs = {...props.attributes[`${fieldKey}`]};
 				if (newValue === '') {
-					delete fieldNames[key];
+					delete fieldAttrs[key];
 				} else {
-					fieldNames[key] = newValue;
+					fieldAttrs[key] = newValue;
 				}
-				props.setAttributes( { fieldNames: fieldNames } );
+				props.setAttributes( { [fieldKey]: fieldAttrs } );
 			} catch(e) {
-				props.setAttributes( { fieldNames: {} } );
+				console.log(e);
+				props.setAttributes( { [fieldKey]: {} } );
 			}
 		}
 
@@ -186,7 +212,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 					title = "Set Field Names"
 					icon="edit"
 				>
-					<SetFieldNames stats={ props.attributes.stats } fieldNames={ props.attributes.fieldNames } onChange={onChangeFieldName} />
+					<SetFieldAttrs stats={ props.attributes.stats } fieldNames={ props.attributes.fieldNames } fieldIcons={ props.attributes.fieldIcons } onChange={onChangeFieldAttr} />
 				</PanelBody>
 			</InspectorControls>
 			,
@@ -201,7 +227,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
 				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
 				<div id="rcmetrics">
-					<RenderFields fieldNames={ props.attributes.fieldNames } stats={ props.attributes.stats }/>
+					<RenderFields fieldNames={ props.attributes.fieldNames } stats={ props.attributes.stats } icons={ props.attributes.fieldIcons }/>
 				</div>
 			</div>
 			</React.Fragment>
@@ -227,7 +253,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
 				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
 				<div id="rcmetrics">
-					<RenderFields fieldNames={ props.attributes.fieldNames } />
+					<RenderFields fieldNames={ props.attributes.fieldNames } icons={ props.attributes.fieldIcons }/>
 				</div>
 			</div>
 			</React.Fragment>

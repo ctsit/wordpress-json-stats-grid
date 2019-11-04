@@ -1,0 +1,11 @@
+{
+    "name": "chemikyle/wordpress-json-statsgrid",
+    "type": "wordpress-plugin",
+    "authors": [
+        {
+            "name": "kyle",
+            "email": "kyle.chesney@ufl.edu"
+        }
+    ],
+    "require": {}
+}
