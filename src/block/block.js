@@ -21,6 +21,8 @@ const {
 	ColorPalette
 } = wp.components;
 
+const { Fragment } = wp.element;
+
 // Preset colors available for ColorPalette
 // built from https://design.webservices.ufhealth.org/docs/design/colors
 const colors = [
@@ -76,7 +78,7 @@ function SetFieldAttrs(props) {
 		return 'Please enter a valid URL';
 	}
 		const fieldItems = Object.keys(props.stats).map( (key) =>
-				<React.Fragment>
+				<Fragment>
 				<TextControl
 					label={key}
 					help='Text that will appear after this metric'
@@ -88,7 +90,7 @@ function SetFieldAttrs(props) {
 					value={ props.fieldIcons[key] }
 					onChange={(newValue) => props.onChange('fieldIcons', {newValue, key})}
 				/>
-				</React.Fragment>
+				</Fragment>
 			);
 		return fieldItems;
 }
@@ -101,25 +103,25 @@ function RenderFields(props) {
 		// they are prepended by javascript in the user-facing site to ensure up-to-date results
 		if (props.hasOwnProperty('stats')) {
 			rows = Object.keys(props.fieldNames).map( (key) =>
-				<React.Fragment>
+				<Fragment>
 				{/* Force icon to align with text */}
 				<style dangerouslySetInnerHTML={{__html:
 					`#${key}::before{
 						vertical-align: middle;
 					}`}} />
 				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
-				</React.Fragment>
+				</Fragment>
 				);
 		} else {
 			rows = Object.keys(props.fieldNames).map( (key) =>
-				<React.Fragment>
+				<Fragment>
 				{/* Force icon to align with text */}
 				<style dangerouslySetInnerHTML={{__html:
 					`#${key}::before{
 						vertical-align: middle;
 					}`}} />
 				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.fieldNames[key]} </div>
-				</React.Fragment>
+				</Fragment>
 				);
 		}
 		return rows;
@@ -251,7 +253,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 				</PanelBody>
 			</InspectorControls>
 			,
-			<React.Fragment>
+			<Fragment>
 				<TextControl
 					label="API endpoint"
 					help="The URL for your JSON data"
@@ -265,7 +267,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 					<RenderFields fieldNames={ props.attributes.fieldNames } stats={ props.attributes.stats } icons={ props.attributes.fieldIcons }/>
 				</div>
 			</div>
-			</React.Fragment>
+			</Fragment>
 			]
 		);
 
@@ -284,14 +286,14 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 */
 	save: ( props ) => {
 		return (
-			<React.Fragment>
+			<Fragment>
 			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
 				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
 				<div id="rcmetrics">
 					<RenderFields fieldNames={ props.attributes.fieldNames } icons={ props.attributes.fieldIcons }/>
 				</div>
 			</div>
-			</React.Fragment>
+			</Fragment>
 		);
 	},
 } );
