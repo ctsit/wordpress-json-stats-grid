@@ -12,16 +12,51 @@ import './style.scss';
 const { __ } = wp.i18n; // Import __() from wp.i18n
 const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.blocks
 
-const {
-	InspectorControls,
-	PanelColorSettings
-} = wp.editor;
+const { InspectorControls } = wp.editor;
 
 const {
 	PanelBody,
 	PanelRow,
-	TextControl
+	TextControl,
+	ColorPalette
 } = wp.components;
+
+// Preset colors available for ColorPalette
+// built from https://design.webservices.ufhealth.org/docs/design/colors
+const colors = [
+	{name: 'blueLightest', color: '#C7DFFA'},
+	{name: 'blueLight', color: '#3A8FEE'},
+	{name: 'blueNormal', color: '#0F5CB1'},
+	{name: 'blueDark', color: '#0B4484'},
+	{name: 'blueDarkest', color: '#072C55'},
+
+	{name: 'navyLightest', color: '#305DB0'},
+	{name: 'navyLight', color: '#254888'},
+	{name: 'navyNormal', color: '#15284C'},
+	{name: 'navyDark', color: '#0F1D38'},
+	{name: 'navyDarkest', color: '#091120'},
+
+	{name: 'slateLightest', color: '#D7DEEA'},
+	{name: 'slateLight', color: '#A1B1CE'},
+	{name: 'slateNormal', color: '#506A9A'},
+	{name: 'slateDark', color: '#3F5379'},
+	{name: 'slateDarkest', color: '#2A3750'},
+
+	{name: 'grayLightest', color: '#F6FBFC'},
+	{name: 'grayLight', color: '#C2CBD6'},
+	{name: 'grayNormal', color: '#758AA4'},
+	{name: 'grayDark', color: '#46566A'},
+	{name: 'grayDarkest', color: '#313C4A'},
+
+	{name: 'orangeLight', color: '#EE7936'},
+	{name: 'orangeNormal', color: '#ED6B21'},
+	{name: 'orangeDark', color: '#CF4B00'},
+
+	{name: 'whiteFull', color: '#FFFFFF'},
+	{name: 'blackFull', color: '#000000'},
+	{name: 'transparent', color: 'transparent'}
+];
+
 
 // Make API Call
 function getRCMetrics(endpoint) {
@@ -49,7 +84,7 @@ function SetFieldAttrs(props) {
 					onChange={(newValue) => props.onChange('fieldNames', {newValue, key})}
 				/>
 				<TextControl
-					label="Icon"
+					label={`Icon for ${key}`}
 					value={ props.fieldIcons[key] }
 					onChange={(newValue) => props.onChange('fieldIcons', {newValue, key})}
 				/>
@@ -184,32 +219,32 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 		return (
 			[
 			<InspectorControls>
-				<PanelColorSettings
-					title={ __('Background Color', 'tar') }
-					icon="admin-appearance"
-					colorSettings={ [ 
-						{
-						value: props.attributes.bgColor,
-						onChange: (colorValue) => props.setAttributes ( { bgColor: colorValue } ),
-						label: __('Color', 'tar'),
-						},
-					] }
-				/>
-
-				<PanelColorSettings
-					title={ __('Text Color', 'tar') }
-					icon="admin-customizer"
-					colorSettings={ [ 
-						{
-						value: props.attributes.textColor,
-						onChange: (colorValue) => props.setAttributes ( { textColor: colorValue } ),
-						label: __('Color', 'tar'),
-						},
-					] }
-				/>
 
 				<PanelBody
-					title = "Set Field Names"
+					title = "Set Block Color"
+					icon="admin-appearance"
+				>
+					<ColorPalette
+						label="label"
+						colors = { colors }
+						value={ props.attributes.bgColor }
+						onChange={ ( color ) => props.setAttributes( { bgColor: color } ) }
+					/>
+				</PanelBody>
+
+				<PanelBody
+					title = "Set Text Color"
+					icon="admin-customizer"
+				>
+					<ColorPalette
+						colors = { colors }
+						value={ props.attributes.textColor }
+						onChange={ ( color ) => props.setAttributes( { textColor: color } ) }
+					/>
+				</PanelBody>
+
+				<PanelBody
+					title = "Set Field Names & Icons"
 					icon="edit"
 				>
 					<SetFieldAttrs stats={ props.attributes.stats } fieldNames={ props.attributes.fieldNames } fieldIcons={ props.attributes.fieldIcons } onChange={onChangeFieldAttr} />
