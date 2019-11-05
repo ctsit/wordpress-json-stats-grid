@@ -25,40 +25,19 @@ const { Fragment } = wp.element;
 
 // Preset colors available for ColorPalette
 // built from https://design.webservices.ufhealth.org/docs/design/colors
-const colors = [
-	{name: 'blueLightest', color: '#C7DFFA'},
-	{name: 'blueLight', color: '#3A8FEE'},
-	{name: 'blueNormal', color: '#0F5CB1'},
-	{name: 'blueDark', color: '#0B4484'},
-	{name: 'blueDarkest', color: '#072C55'},
-
-	{name: 'navyLightest', color: '#305DB0'},
-	{name: 'navyLight', color: '#254888'},
-	{name: 'navyNormal', color: '#15284C'},
-	{name: 'navyDark', color: '#0F1D38'},
-	{name: 'navyDarkest', color: '#091120'},
-
-	{name: 'slateLightest', color: '#D7DEEA'},
-	{name: 'slateLight', color: '#A1B1CE'},
-	{name: 'slateNormal', color: '#506A9A'},
+const bgColors = [
 	{name: 'slateDark', color: '#3F5379'},
-	{name: 'slateDarkest', color: '#2A3750'},
-
 	{name: 'grayLightest', color: '#F6FBFC'},
-	{name: 'grayLight', color: '#C2CBD6'},
-	{name: 'grayNormal', color: '#758AA4'},
-	{name: 'grayDark', color: '#46566A'},
-	{name: 'grayDarkest', color: '#313C4A'},
-
-	{name: 'orangeLight', color: '#EE7936'},
-	{name: 'orangeNormal', color: '#ED6B21'},
-	{name: 'orangeDark', color: '#CF4B00'},
-
-	{name: 'whiteFull', color: '#FFFFFF'},
-	{name: 'blackFull', color: '#000000'},
-	{name: 'transparent', color: 'transparent'}
+	{name: 'blueDarkest', color: '#072C55'},
+	{name: 'blueNormal', color: '#0F5CB1'}
 ];
 
+const textColors = [
+	{name: 'whiteFull', color: '#FFFFFF'},
+	{name: 'orangeDark', color: '#CF4B00'},
+	{name: 'grayLight', color: '#C2CBD6'},
+	{name: 'blackFull', color: '#000000'}
+];
 
 // Make API Call
 function getRCMetrics(endpoint) {
@@ -228,7 +207,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 				>
 					<ColorPalette
 						label="label"
-						colors = { colors }
+						colors = { bgColors }
 						value={ props.attributes.bgColor }
 						onChange={ ( color ) => props.setAttributes( { bgColor: color } ) }
 					/>
@@ -239,7 +218,7 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 					icon="admin-customizer"
 				>
 					<ColorPalette
-						colors = { colors }
+						colors = { textColors }
 						value={ props.attributes.textColor }
 						onChange={ ( color ) => props.setAttributes( { textColor: color } ) }
 					/>
