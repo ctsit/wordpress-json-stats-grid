@@ -65,13 +65,6 @@ function redcap_stats_plugin_cgb_block_assets() { // phpcs:ignore
 		]
 	);
 
-    // add js needed to keep statistics updated after editing
-    wp_register_script(
-            'redcap_stats_plugin-populate',
-            plugins_url('/src/block/populate.js', dirname( __FILE__ ))
-            );
-    wp_enqueue_script( 'redcap_stats_plugin-populate' );
-
 	/**
 	 * Register Gutenberg block on server-side.
 	 *
@@ -90,10 +83,34 @@ function redcap_stats_plugin_cgb_block_assets() { // phpcs:ignore
 			'editor_script' => 'redcap_stats_plugin-cgb-block-js',
 			// Enqueue blocks.editor.build.css in the editor only.
 			'editor_style'  => 'redcap_stats_plugin-cgb-block-editor-css',
+			'render_callback' => 'redcap_stats_plugin_cgb_dynamic_render_callback',
 		)
 	);
 }
 
+function redcap_stats_plugin_cgb_dynamic_render_callback($attributes, $content) {
+	return construct_frontend_block($attributes);
+}
+
+// build the same block editors see
+// populate values with fresh data
+function construct_frontend_block($attributes) {
+	$api_response = json_decode(file_get_contents($attributes['endpoint']), $assoc = true);
+	if (!$api_response['success']) return;
+
+	$api_data = $api_response['data'][0];
+
+	$className = "wp-block-cgb-block-redcap-stats-plugin";
+	$block = "<div class='$className' style='background-color: " . $attributes['bgColor'] . "; color: " . $attributes['textColor'] . "'>";
+	$block .= "<div id='rcmetrics'>";
+
+	foreach ($api_data as $k => $v) {
+		$block .= "<div id='$k' class='grid-item dashicons-before " . $attributes['fieldIcons'][$k] . "'>$v " . $attributes['fieldNames'][$k] . "</div>";
+	}
+	$block .= "</div></div>";
+
+	return $block;
+}
+
 // Hook: Block assets.
 add_action( 'init', 'redcap_stats_plugin_cgb_block_assets' );
-

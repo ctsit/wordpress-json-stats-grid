@@ -15,10 +15,10 @@ const { registerBlockType } = wp.blocks; // Import registerBlockType() from wp.b
 const { InspectorControls } = wp.blockEditor;
 
 const {
+	ColorPalette,
 	PanelBody,
 	PanelRow,
-	TextControl,
-	ColorPalette
+	TextControl
 } = wp.components;
 
 const { Fragment } = wp.element;
@@ -78,31 +78,16 @@ function SetFieldAttrs(props) {
 function RenderFields(props) {
 	try {
 		let rows;
-		// Stats are only passed in the editor setting
-		// they are prepended by javascript in the user-facing site to ensure up-to-date results
-		if (props.hasOwnProperty('stats')) {
-			rows = Object.keys(props.fieldNames).map( (key) =>
-				<Fragment>
-				{/* Force icon to align with text */}
-				<style dangerouslySetInnerHTML={{__html:
-					`#${key}::before{
-						vertical-align: middle;
-					}`}} />
-				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
-				</Fragment>
-				);
-		} else {
-			rows = Object.keys(props.fieldNames).map( (key) =>
-				<Fragment>
-				{/* Force icon to align with text */}
-				<style dangerouslySetInnerHTML={{__html:
-					`#${key}::before{
-						vertical-align: middle;
-					}`}} />
-				<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.fieldNames[key]} </div>
-				</Fragment>
-				);
-		}
+		rows = Object.keys(props.fieldNames).map( (key) =>
+			<Fragment>
+			{/* Force icon to align with text */}
+			<style dangerouslySetInnerHTML={{__html:
+				`#${key}::before{
+					vertical-align: middle;
+				}`}} />
+			<div class={"grid-item dashicons-before " + props.icons[key]} id={key}>{props.stats[key]} {props.fieldNames[key]} </div>
+			</Fragment>
+			);
 		return rows;
 	} catch(e) {
 		return 'Please enter a valid URL';
@@ -265,14 +250,8 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 	 */
 	save: ( props ) => {
 		return (
-			<Fragment>
-			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
-				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
-				<div id="rcmetrics">
-					<RenderFields fieldNames={ props.attributes.fieldNames } icons={ props.attributes.fieldIcons }/>
-				</div>
-			</div>
-			</Fragment>
+			// Rendered server side
+			null
 		);
 	},
 } );
