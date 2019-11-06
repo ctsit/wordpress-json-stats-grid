@@ -226,7 +226,6 @@ registerBlockType( 'cgb/block-redcap-stats-plugin', {
 				/>
 
 			<div className={ props.className } style={ {backgroundColor: props.attributes.bgColor, color: props.attributes.textColor} } >
-				<p hidden id="expose-endpoint-hack">{ props.attributes.endpoint }</p>
 				<div id="rcmetrics">
 					<RenderFields fieldNames={ props.attributes.fieldNames } stats={ props.attributes.stats } icons={ props.attributes.fieldIcons }/>
 				</div>
