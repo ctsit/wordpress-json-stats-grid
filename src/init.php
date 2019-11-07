@@ -104,8 +104,9 @@ function construct_frontend_block($attributes) {
 	$block = "<div class='$className' style='background-color: " . $attributes['bgColor'] . "; color: " . $attributes['textColor'] . "'>";
 	$block .= "<div id='rcmetrics'>";
 
-	foreach ($api_data as $k => $v) {
-		$block .= "<div id='$k' class='grid-item dashicons-before " . $attributes['fieldIcons'][$k] . "'>$v " . $attributes['fieldNames'][$k] . "</div>";
+	foreach ($attributes['fieldNames'] as $k => $v) {
+		$icon = (isset($attributes['fieldIcons'])) ? $attributes['fieldIcons'][$k] : '';
+		$block .= "<div id='$k' class='grid-item dashicons-before $icon'>" .  $api_data[$k] . " $v</div>";
 	}
 	$block .= "</div></div>";
 
