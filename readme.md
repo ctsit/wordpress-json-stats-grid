@@ -1,3 +1,5 @@
+# This repository has been archived and is no longer actively maintained. The software has numerous dependabot issues, and we do not have the capacity to address them at this time. It is preserved for historical reference only. 
+
 This project was bootstrapped with [Create Guten Block](https://github.com/ahmadawais/create-guten-block).
 
 Below you will find some information on how to run scripts.
